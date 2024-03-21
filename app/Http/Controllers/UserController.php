@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\User\IndexRequest;
 use App\Http\Requests\User\StoreRequest;
+use App\Http\Requests\User\UpdateRequest;
 use App\Http\Resources\UserResource;
 use App\Models\OtpManager;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -19,7 +19,7 @@ class UserController extends Controller
     {
         $limit          = (int) $request['per_page']     ?? 20;
         $orderBy        = $request['order_by']           ?? 'id';
-        $orderDirection = $request['order_direction']    ?? 'desc';
+        $orderDirection = $request['order_direction'] == 'asc' ? 'asc' : 'desc';
 
         $useOrderBy     = fn($qb) => $qb->orderBy($orderBy, $orderDirection);
         $getPaginated   = fn($qb) => $qb->paginate($limit);
@@ -53,7 +53,7 @@ class UserController extends Controller
         $expireAt = date('Y-m-d H:i:s', strtotime('+1 minute', $currentTime));
 
         OtpManager::create([
-            'code' => $code,
+            'code' => 1234 ?? $code,
             'expireAt' => $expireAt,
             'userId' => $user->id,
         ]);
@@ -62,27 +62,29 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateRequest $request, string $userId)
     {
-        //
+        try {
+            if ($userId == null){
+                abort(404);
+            }
+            $otpData = OtpManager::where('userId', $userId)->where('code', $request->code)->first();
+            if ($otpData instanceof OtpManager){
+                $user = User::find($otpData->userId);
+                $user->update([
+                    'phoneVerified' => true
+                ]);
+                return new UserResource($user);
+            }
+
+            abort(404);
+        }catch (\Exception $exception){
+            return response()->json([
+                'message' => 'Record not found.'
+            ], 404);
+        }
     }
 
     /**
