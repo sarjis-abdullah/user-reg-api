@@ -26,8 +26,8 @@ class StoreRequest extends FormRequest
         return [
             'name' => 'required|string',
             'address' => 'required|string',
-            'phone' => 'required|string',
-            'birthDate' => 'required|date|date_format:Y-m-d',
+            'phone' => 'required|string|regex:/(01)[0-9]{9}/|min:11',
+            'birthDate' => 'required|date|date_format:Y-m-d|before:today',
             'email' => 'nullable|email',
             'occupation' => 'nullable|string',
             'familyMembers' => 'nullable|string',
