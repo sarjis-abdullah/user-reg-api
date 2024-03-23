@@ -2,30 +2,43 @@
 
 namespace App\Http\Requests\User;
 
-use App\Http\Requests\Request;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
-class StoreRequest extends Request
+class StoreRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array
+     * @return array<string, ValidationRule|array|string>
      */
-    public function rules()
+    public function rules(): array
     {
-        return $rules = [
-            'name' => 'max:255',
-            'email' => 'email|required_without:phone|unique:users|max:255',
-            'phone' => 'required_without:email|unique:users',
-            'password' => 'required|min:6|max:255',
-            'locale' => 'in:en,bn',
-            'isActive' => 'boolean',
-            'role' => '',
-            'role.roleId' => 'exists:roles,id',
-            'pref_notification_type' => '',
-            'pref_notification_time' => '',
+        return [
+            'name' => 'required|string',
+            'address' => 'required|string',
+            'phone' => 'required|string|regex:/(01)[0-9]{9}/|min:11',
+            'birthDate' => 'required|date|date_format:Y-m-d|before:today',
+            'email' => 'nullable|email',
+            'occupation' => 'nullable|string',
+            'familyMembers' => 'nullable|string',
+            'gender' => 'nullable|string',
+            'anniversary' => 'nullable|date|date_format:Y-m-d',
+            'hasComplimentaryCard' => 'nullable|boolean',
         ];
     }
 
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        throw new HttpResponseException(response()->json($validator->errors(), 422));
+    }
 }

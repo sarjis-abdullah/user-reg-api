@@ -38,8 +38,8 @@ class StoreDailySummaryHistory extends Command
      */
     public function handle()
     {
-        Dashboard::storeDailySummary();
+        // Dashboard::storeDailySummary();
 
-        echo 'Daily summary report store done!';
+        // echo 'Daily summary report store done!';
     }
 }

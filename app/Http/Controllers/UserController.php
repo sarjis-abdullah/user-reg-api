@@ -2,115 +2,111 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Http\Requests\User\IndexRequest;
+use App\Http\Requests\User\LoginRequest;
 use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Http\Resources\UserResource;
-use App\Repositories\Contracts\UserRepository;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use App\Http\Resources\UserResourceCollection;
+use App\Models\OtpManager;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Mockery\Exception;
 
 class UserController extends Controller
 {
     /**
-     * @var UserRepository
+     * Display a listing of the resource.
      */
-    protected $userRepository;
-
-    /**
-     * UserController constructor.
-     *
-     * @param UserRepository $userRepository
-     */
-    public function __construct(UserRepository $userRepository)
+    public function index(IndexRequest $request)
     {
-        $this->userRepository = $userRepository;
+        $limit          = (int) $request['per_page']  ?? 20;
+        $orderBy        = $request['order_by']           ?? 'id';
+        $orderDirection = $request['order_direction'] == 'asc' ? 'asc' : 'desc';
+
+        $useOrderBy     = fn($qb) => $qb->orderBy($orderBy, $orderDirection);
+        $getPaginated   = fn($qb) => $qb->paginate($limit);
+        $getAll         = fn($qb) => $qb->get();
+
+        return new UserResourceCollection(User::where('phoneVerified', true)->when($useOrderBy, $getAll, $getPaginated));
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @param IndexRequest $request
-     * @return AnonymousResourceCollection
-     * @throws AuthorizationException
+     * Show the form for creating a new resource.
      */
-    public function index(IndexRequest $request): AnonymousResourceCollection
+    public function create()
     {
-        $this->authorize('list', User::class);
-
-        $users = $this->userRepository->findBy($request->all());
-
-        return UserResource::collection($users);
+        //
     }
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param StoreRequest $request
-     * @return UserResource
-     * @throws AuthorizationException
      */
     public function store(StoreRequest $request)
     {
-        $this->authorize('store', User::class);
+        dd(12);
+        $user = User::create([...$request->validated(), 'password' => Hash::make('A!23456')]);
 
-        $user = $this->userRepository->save($request->all());
-
-        return new UserResource($user);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param $id
-     * @return UserResource|JsonResponse
-     * @throws AuthorizationException
-     */
-    public function show($id)
-    {
-        $user = $this->userRepository->findOne($id);
-
-        if (!$user instanceof User) {
-            return response()->json(['status' => 404, 'message' => 'Resource not found with the specific id.'], 404);
+        $digits = "0123456789";
+        $code = "";
+        for ($i = 0; $i < 4; $i++) {
+            $code .= $digits[rand(0, 9)];
         }
+        $currentTime = time();
+        $expireAt = date('Y-m-d H:i:s', strtotime('+1 minute', $currentTime));
 
-        $this->authorize('show', $user);
+        OtpManager::create([
+            'code' => 1234 ?? $code,
+            'expireAt' => $expireAt,
+            'userId' => $user->id,
+        ]);
 
         return new UserResource($user);
     }
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param UpdateRequest $request
-     * @param User $user
-     * @return UserResource
-     * @throws AuthorizationException
      */
-    public function update(UpdateRequest $request, User $user)
+    public function update(UpdateRequest $request, string $userId)
     {
-        $this->authorize('update', $user);
+        try {
+            if ($userId == null){
+                abort(404);
+            }
+            $otpData = OtpManager::where('userId', $userId)->where('code', $request->code)->first();
+            if ($otpData instanceof OtpManager){
+                $user = User::find($otpData->userId);
+                $user->update([
+                    'phoneVerified' => true
+                ]);
+                return new UserResource($user);
+            }
 
-        $user = $this->userRepository->updateUser($user, $request->all());
-
-        return new UserResource($user);
+            abort(404);
+        }catch (\Exception $exception){
+            return response()->json([
+                'message' => 'Record not found.'
+            ], 404);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param User $user
-     * @return null;
-     * @throws AuthorizationException
      */
-    public function destroy(User $user)
+    public function login(LoginRequest $request)
     {
-        $this->authorize('destroy', $user);
+        $user = User::where('phone', $request->phone)->first();
 
-        $this->userRepository->delete($user);
+        if ($user instanceof User) {
+            if (Hash::check($request->get('password'), $user->password)) {
+                $token = $user->createToken('Password Grant Client')->accessToken;
 
-        return response()->json(null, 204);
+                return response(['accessToken' => $token, 'user' => new UserResource($user)], 200);
+            } else {
+                return response(['message' => __('auth.password_mismatch')], 422);
+            }
+        } else {
+            return response(['message' => __('auth.no_user')], 422);
+        }
     }
 }

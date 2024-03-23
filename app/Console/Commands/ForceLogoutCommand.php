@@ -28,8 +28,8 @@ class ForceLogoutCommand extends Command
      */
     public function handle()
     {
-        DB::table('oauth_access_tokens')->delete();
+        // DB::table('oauth_access_tokens')->delete();
 
-        $this->info('User sessions forcefully logged out.');
+        // $this->info('User sessions forcefully logged out.');
     }
 }

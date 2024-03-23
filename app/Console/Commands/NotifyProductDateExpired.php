@@ -47,28 +47,28 @@ class NotifyProductDateExpired extends Command
      */
     public function handle()
     {
-        $stockRepository = app(StockRepository::class);
-        $day = $this->option('day');
-        $startDate = Carbon::now()->toDateString();
-        $endDate = Carbon::now()->addDays($day)->toDateString();
+        // $stockRepository = app(StockRepository::class);
+        // $day = $this->option('day');
+        // $startDate = Carbon::now()->toDateString();
+        // $endDate = Carbon::now()->addDays($day)->toDateString();
 
-        $branches = app(BranchRepository::class)->getModel()->all();
+        // $branches = app(BranchRepository::class)->getModel()->all();
 
-        foreach ($branches as $branch) {
-            $products = $stockRepository->getModel()
-                ->whereDate('expiredDate', '<=', $endDate)
-                ->whereDate('expiredDate', '>=', $startDate)
-                ->where('branchId', '=', $branch->id)
-                ->where('quantity', '>', 0)
-                ->get();
+        // foreach ($branches as $branch) {
+        //     $products = $stockRepository->getModel()
+        //         ->whereDate('expiredDate', '<=', $endDate)
+        //         ->whereDate('expiredDate', '>=', $startDate)
+        //         ->where('branchId', '=', $branch->id)
+        //         ->where('quantity', '>', 0)
+        //         ->get();
 
-            if(count($products)) {
-                $this->notifyUsers($branch, $products, $day);
-                $this->info('Stock expiration report sent to all the manager users of ' . $branch->name );
-            }
-        }
+        //     if(count($products)) {
+        //         $this->notifyUsers($branch, $products, $day);
+        //         $this->info('Stock expiration report sent to all the manager users of ' . $branch->name );
+        //     }
+        // }
 
-        $this->info('Products stock expiration list sent successfully!');
+        // $this->info('Products stock expiration list sent successfully!');
     }
 
     /**
@@ -79,13 +79,13 @@ class NotifyProductDateExpired extends Command
      */
     public function notifyUsers(Branch $branch, $products, $day)
     {
-        $users = $branch->adminUserRoles->map(fn ($userRole) => $userRole->user && $userRole->user->isActive);
+        // $users = $branch->adminUserRoles->map(fn ($userRole) => $userRole->user && $userRole->user->isActive);
 
-        $users->each(function ($user) use ($branch, $products, $day) {
-            if ($user){
-                $user->notify(new ProductExpired($branch, $products, $day));
-            }
-        });
+        // $users->each(function ($user) use ($branch, $products, $day) {
+        //     if ($user){
+        //         $user->notify(new ProductExpired($branch, $products, $day));
+        //     }
+        // });
     }
 
 }

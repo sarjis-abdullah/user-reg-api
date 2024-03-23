@@ -56,7 +56,6 @@ use App\Policies\SupplierPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\UserProfilePolicy;
 use App\Policies\UserRolePolicy;
-use App\Services\Helpers\ScopesHelper;
 use Ejarnutowski\LaravelApiKey\Models\ApiKey;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\App;
@@ -120,7 +119,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         if (!App::runningInConsole()) {
-            Passport::tokensCan(ScopesHelper::allScopes());
+
         }
 
         Passport::routes(null, ['prefix' => 'api/v1/oauth']);

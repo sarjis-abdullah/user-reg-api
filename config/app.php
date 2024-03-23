@@ -171,7 +171,7 @@ return [
         /*
          * Package Service Providers...
          */
-        Intervention\Image\ImageServiceProvider::class,
+        // Intervention\Image\ImageServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -179,17 +179,17 @@ return [
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
-        App\Providers\EventServiceProvider::class,
+        // App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
-        \App\Providers\RepositoryServiceProvider::class,
+        // \App\Providers\RepositoryServiceProvider::class,
         \App\Providers\ValidatorServiceProvider::class,
 
-        Milon\Barcode\BarcodeServiceProvider::class,
+        // Milon\Barcode\BarcodeServiceProvider::class,
 
-        Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class,
-        Ejarnutowski\LaravelApiKey\Providers\ApiKeyServiceProvider::class,
-        Maatwebsite\Excel\ExcelServiceProvider::class,
+        // Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class,
+        // Ejarnutowski\LaravelApiKey\Providers\ApiKeyServiceProvider::class,
+        // Maatwebsite\Excel\ExcelServiceProvider::class,
     ],
 
     /*
