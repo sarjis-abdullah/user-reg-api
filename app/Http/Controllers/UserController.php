@@ -44,7 +44,6 @@ class UserController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        dd(12);
         $user = User::create([...$request->validated(), 'password' => Hash::make('A!23456')]);
 
         $digits = "0123456789";
