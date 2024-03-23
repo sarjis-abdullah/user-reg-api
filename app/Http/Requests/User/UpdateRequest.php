@@ -2,33 +2,76 @@
 
 namespace App\Http\Requests\User;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Http\Requests\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
-class UpdateRequest extends FormRequest
+class UpdateRequest extends Request
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array
      */
-    public function rules(): array
+    public function rules()
     {
-        return [
-            'code' => 'required'
+        $userId = $this->segment(4);
+        return $rules = [
+            'password' => 'min:6|required_with:current_password|max:255',
+            'current_password' => 'required_with:password|max:255',
+            'email' => Rule::unique('users')->ignore($userId, 'id'),
+            'phone' => [Rule::unique('users')->ignore($userId, 'id')],
+            'name' => 'max:255',
+            'locale' => 'in:en,bn',
+            'isActive' => 'boolean',
+            'notificationSeen' => 'boolean',
+            'role' => '',
+            'role.id' => 'exists:user_roles,id',
+            'role.roleId' => 'exists:roles,id',
+            'role.oldRoleId' => 'exists:roles,id',
         ];
     }
 
-    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    /**
+     * Configure the validator instance.
+     *
+     * @param \Illuminate\Validation\Validator $validator
+     * @return void
+     */
+    public function withValidator($validator)
     {
-        throw new HttpResponseException(response()->json($validator->errors(), 422));
+        parent::withValidator($validator);
+
+        $validator->after(function ($validator) {
+            if ($this->input('password')) {
+
+                // get User model from route binding
+                $user = $this->route('user');
+
+                if (empty($user->password)) {
+                    $this->request->add(['password' => $this->input('password')]);
+                    $this->request->remove('current_password');
+                } else if (Hash::check($this->input('current_password'), $user->password)) {
+                    $this->request->add(['password' => $this->input('password')]);
+                    $this->request->remove('current_password');
+                } else {
+                    $validator->errors()->add('current_password', 'Current password doesn\'t match.');
+                }
+            }
+        });
     }
+
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'password.required_with' => 'New password is required when current password is present.',
+        ];
+    }
+
 }

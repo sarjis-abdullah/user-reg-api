@@ -1,66 +1,74 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Start POS by following
+We have to go through https://github.com/shahriar1/devserver
+Check php version in both devserver/php/Dockerfile and composer.json inside application
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Setup Instructions:
 
-## About Laravel
+- RUN `git clone https://github.com/shahriar1/devserver.git`
+- Copy following dockerfile code and put it inside devserver/Dockerfile
+- ```
+  FROM php:8.1.8-fpm
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+    RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+    && php composer-setup.php \
+    && php -r "unlink('composer-setup.php');" \
+    && chmod +x composer.phar \
+    && mv composer.phar /usr/local/bin/composer
+    
+    
+    RUN apt-get update && apt-get install -y \
+    git build-essential libmcrypt-dev libreadline-dev zip unzip \
+    libssl-dev zlib1g-dev libpng-dev libjpeg-dev libfreetype6-dev \
+    jpegoptim optipng pngquant gifsicle webp libzip-dev zlib1g-dev zip unzip libxml2-dev libicu-dev
+    
+    RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/
+    
+    RUN docker-php-ext-install pdo_mysql pcntl bcmath gd soap
+    
+    RUN docker-php-ext-configure zip \
+    && docker-php-ext-install zip
+    
+    RUN apt-get update && apt-get install -y \
+    redis-server \
+    && pecl install redis \
+    && docker-php-ext-enable redis
+    
+    RUN pecl install mongodb
+    RUN docker-php-ext-enable mongodb
+    
+    RUN docker-php-ext-configure intl \
+    && docker-php-ext-install intl
+    
+    #WORKDIR /var/www/app
+    
+    CMD ["/usr/local/sbin/php-fpm"]
+  ```
+- Check php version in both devserver/php/Dockerfile and composer.json and run `docker-compose up -d`
+- Go back and CD into `apps` directory
+- Now run `git clone https://github.com/shahriar1/pos-api.git`.
+- Edit `/etc/hosts` and use your repo name to point as `127.0.0.1 pos-api`. e.g. Now visit `http://pos-api`
+- Now run `docker-compose exec php bash`
+- `composer install`
+- `php artisan list`
+- `php artisan migrate`
+- `php artisan key:generate`
+### On Ubuntu we may need to run 
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- sudo chmod -R 777 apps/pos-api/vendor/
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- sudo chmod -R 777 apps/pos-api/storage/logs/laravel.log
 
-## Learning Laravel
+- sudo chmod -R 777 apps/pos-api/storage/framework/sessions
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Update your .env exactly as devserver/docker-compose.yml
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```RUN 
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=devapp3
+DB_USERNAME=devuser3
+DB_PASSWORD=s3cret3
+```
+For TablePlus it will look like as following:
+![img.png](img.png)

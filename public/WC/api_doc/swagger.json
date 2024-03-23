@@ -1,0 +1,749 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "POS - Api Documentation",
+        "title": "Reformed Tech POS - Api Documentation",
+        "termsOfService": "https://reformedtech.org",
+        "contact": {
+            "email": "contact@reformedtech.org"
+        }
+    },
+    "host": "localhost:8000",
+    "basePath": "/wc-api",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "paths": {
+        "/products": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Product list",
+                "description": "Getting product list with relational data.",
+                "operationId": "products",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "id",
+                        "description": "id",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "createdByUserId",
+                        "description": "createdByUserId",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "categoryId",
+                        "description": "categoryId",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "subCategoryId",
+                        "description": "subCategoryId",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "companyId",
+                        "description": "companyId",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "brandId",
+                        "description": "brandId",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "branchId",
+                        "description": "branchId",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "acceptWithoutStock",
+                        "description": "acceptWithoutStock",
+                        "required": false,
+                        "enum": ["1"],
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sku",
+                        "description": "sku",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "barcode",
+                        "description": "barcode",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order_by",
+                        "description": "order_by",
+                        "enum": [
+                            "id",
+                            "createdByUserId",
+                            "companyId",
+                            "categoryId",
+                            "subCategoryId",
+                            "brandId",
+                            "unitId",
+                            "discountId",
+                            "isDiscountApplicable",
+                            "taxId",
+                            "name",
+                            "genericName",
+                            "selfNumber",
+                            "barcode",
+                            "description",
+                            "status",
+                            "alertQuantity",
+                        ],
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order_direction",
+                        "description": "order_direction",
+                        "required": false,
+                        "enum": ["asc", "desc"],
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "per_page",
+                        "description": "per_page",
+                        "required": false,
+                        "type": "number",
+                        "maximum": 100
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "required": false,
+                        "type": "number",
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data found",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method not allow",
+                        "schema": {
+                            "$ref": "#/definitions/MethodNotAllow"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocess Request / When Error occured",
+                        "schema": {
+                            "$ref": "#/definitions/UnProcessRequest"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized request!",
+                        "schema": {
+                            "$ref": "#/definitions/UnauthorizedError"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "X-Authorization": []
+                    }
+                ]
+            }
+        },
+        "/products/{product_id}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Single Product",
+                "description": "Getting product with relational data.",
+                "operationId": "singleProduct",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "product_id",
+                        "description": "product_id",
+                        "required": true,
+                        "type": "number"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data found",
+                        "schema": {
+                            "$ref": "#/definitions/ApiFindResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method not allow",
+                        "schema": {
+                            "$ref": "#/definitions/MethodNotAllow"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Request / When Error occurred",
+                        "schema": {
+                            "$ref": "#/definitions/UnProcessRequest"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized request!",
+                        "schema": {
+                            "$ref": "#/definitions/UnauthorizedError"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "X-Authorization": []
+                    }
+                ]
+            }
+        },
+
+        "/orders": {
+            "get": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Order list",
+                "description": "Getting Order list with relational data.",
+                "operationId": "orders",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "id",
+                        "description": "id",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "createdByUserId",
+                        "description": "createdByUserId",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "companyId",
+                        "description": "companyId",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "branchId",
+                        "description": "branchId",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "referenceId",
+                        "description": "referenceId",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "salePersonId",
+                        "description": "salePersonId",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "customerId",
+                        "description": "customerId",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "couponId",
+                        "description": "couponId",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "invoice",
+                        "description": "invoice",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "terminal",
+                        "description": "terminal",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "amount",
+                        "description": "amount",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "tax",
+                        "description": "tax",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "discount",
+                        "description": "discount",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "roundOffAmount",
+                        "description": "roundOffAmount",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "shippingCost",
+                        "description": "shippingCost",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "paid",
+                        "description": "paid",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "due",
+                        "description": "due",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "deliveryMethod",
+                        "description": "deliveryMethod",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "on-spot",
+                            "transfer"
+                        ]
+                    },
+                    {
+                        "in": "query",
+                        "name": "paymentStatus",
+                        "description": "paymentStatus",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "paid",
+                            "unpaid",
+                            "partial"
+                        ]
+                    },
+                    {
+                        "in": "query",
+                        "name": "status",
+                        "description": "status",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "delivered",
+                            "pending",
+                            "ordered",
+                            "returned"
+                        ]
+                    },
+                    {
+                        "in": "query",
+                        "name": "updatedByUserId",
+                        "description": "updatedByUserId",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
+                        "in": "query",
+                        "name": "startDate",
+                        "description": "startDate",
+                        "required": false,
+                        "type": "string",
+                        "format": "Y-m-d"
+                    },
+                    {
+                        "in": "query",
+                        "name": "endDate",
+                        "description": "endDate",
+                        "required": false,
+                        "type": "string",
+                        "format": "Y-m-d"
+                    },
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+
+
+
+                    {
+                        "in": "query",
+                        "name": "order_by",
+                        "description": "order_by",
+                        "enum": [
+                            "id",
+                            "createdByUserId",
+                            "companyId",
+                            "branchId",
+                            "salePersonId",
+                            "customerId",
+                            "referenceId",
+                            "date",
+                            "terminal",
+                            "invoice",
+                            "tax",
+                            "shippingCost",
+                            "discount",
+                            "roundOffAmount",
+                            "amount",
+                            "profitAmount",
+                            "grossProfit",
+                            "paid",
+                            "due",
+                            "couponId",
+                            "deliveryMethod",
+                            "status",
+                            "paymentStatus"
+                        ],
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order_direction",
+                        "description": "order_direction",
+                        "required": false,
+                        "enum": ["asc", "desc"],
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "per_page",
+                        "description": "per_page",
+                        "required": false,
+                        "type": "number",
+                        "maximum": 100
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "required": false,
+                        "type": "number",
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data found",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method not allow",
+                        "schema": {
+                            "$ref": "#/definitions/MethodNotAllow"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocess Request / When Error occured",
+                        "schema": {
+                            "$ref": "#/definitions/UnProcessRequest"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized request!",
+                        "schema": {
+                            "$ref": "#/definitions/UnauthorizedError"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "X-Authorization": []
+                    }
+                ]
+            }
+        },
+        "/orders/{order_id}": {
+            "get": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Single Order",
+                "description": "Getting order with relational data.",
+                "operationId": "singleOrder",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "order_id",
+                        "description": "order_id",
+                        "required": true,
+                        "type": "number"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data found",
+                        "schema": {
+                            "$ref": "#/definitions/ApiFindResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method not allow",
+                        "schema": {
+                            "$ref": "#/definitions/MethodNotAllow"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Request / When Error occurred",
+                        "schema": {
+                            "$ref": "#/definitions/UnProcessRequest"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized request!",
+                        "schema": {
+                            "$ref": "#/definitions/UnauthorizedError"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "X-Authorization": []
+                    }
+                ]
+            }
+        },
+
+        "/stocks": {
+            "put": {
+                "tags": [
+                    "Stocks"
+                ],
+                "summary": "Stock Update",
+                "operationId": "stocks",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "productId",
+                        "in": "formData",
+                        "description": "Specific Product id",
+                        "required": true,
+                        "type": "number"
+                    },
+                    {
+                        "name": "sku",
+                        "in": "formData",
+                        "description": "Specific Product sku",
+                        "required": true,
+                        "type": "number"
+                    },
+                    {
+                        "name": "saleQuantity",
+                        "in": "formData",
+                        "description": "Sale Quantity",
+                        "required": true,
+                        "type": "number"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data found",
+                        "schema": {
+                            "$ref": "#/definitions/ApiResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method not allow",
+                        "schema": {
+                            "$ref": "#/definitions/MethodNotAllow"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocess Request / When Error occured",
+                        "schema": {
+                            "$ref": "#/definitions/UnProcessRequest"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized request!",
+                        "schema": {
+                            "$ref": "#/definitions/UnauthorizedError"
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "X-Authorization": []
+                    }
+                ]
+            }
+        }
+    },
+    "securityDefinitions": {
+        "X-Authorization": {
+            "type": "apiKey",
+            "name": "X-Authorization",
+            "in": "header"
+        }
+    },
+    "definitions": {
+        "ApiResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "default": []
+                },
+                "links": {
+                    "type": "object",
+                    "default": {
+
+                    }
+                },
+                "meta": {
+                    "type": "object",
+                    "default": {
+
+                    }
+                }
+            }
+        },
+        "ApiFindResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object"
+                }
+            }
+        },
+        "MethodNotAllow": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "number",
+                    "default": 405
+                },
+                "message": {
+                    "type": "string",
+                    "default": "Method Not Allowed."
+                }
+            }
+        },
+        "UnProcessRequest": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "default": "The given data was invalid."
+                },
+                "errors": {
+                    "type": "object",
+                    "default": {}
+                }
+            }
+        },
+        "UnauthorizedError": {
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "array",
+                    "default": [
+                        "message": "Unauthorized"
+                    ]
+                }
+            }
+        }
+    },
+    "externalDocs": {
+        "description": "Find out more about Swagger",
+        "url": "http://swagger.io"
+    }
+}
