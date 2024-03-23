@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\User\IndexRequest;
+use App\Http\Requests\User\LoginRequest;
 use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\UserResourceCollection;
 use App\Models\OtpManager;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Mockery\Exception;
 
 class UserController extends Controller
 {
@@ -17,7 +20,7 @@ class UserController extends Controller
      */
     public function index(IndexRequest $request)
     {
-        $limit          = (int) $request['per_page']     ?? 20;
+        $limit          = (int) $request['per_page']  ?? 20;
         $orderBy        = $request['order_by']           ?? 'id';
         $orderDirection = $request['order_direction'] == 'asc' ? 'asc' : 'desc';
 
@@ -25,7 +28,7 @@ class UserController extends Controller
         $getPaginated   = fn($qb) => $qb->paginate($limit);
         $getAll         = fn($qb) => $qb->get();
 
-        return User::when($useOrderBy)->when($getAll, $getPaginated);
+        return new UserResourceCollection(User::where('phoneVerified', true)->when($useOrderBy, $getAll, $getPaginated));
     }
 
     /**
@@ -41,8 +44,7 @@ class UserController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        $request['password'] = Hash::make('A!23456');
-        $user = User::create($request->validated());
+        $user = User::create([...$request->validated(), 'password' => Hash::make('A!23456')]);
 
         $digits = "0123456789";
         $code = "";
@@ -90,8 +92,20 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function login(LoginRequest $request)
     {
-        //
+        $user = User::where('phone', $request->phone)->first();
+
+        if ($user instanceof User) {
+            if (Hash::check($request->get('password'), $user->password)) {
+                $token = $user->createToken('Password Grant Client')->accessToken;
+
+                return response(['accessToken' => $token, 'user' => new UserResource($user)], 200);
+            } else {
+                return response(['message' => __('auth.password_mismatch')], 422);
+            }
+        } else {
+            return response(['message' => __('auth.no_user')], 422);
+        }
     }
 }
