@@ -10,8 +10,11 @@ use App\Http\Resources\UserResource;
 use App\Http\Resources\UserResourceCollection;
 use App\Models\OtpManager;
 use App\Models\User;
+use App\Services\SmsService;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Hash;
 use Mockery\Exception;
+use GuzzleHttp\Client;
 
 class UserController extends Controller
 {
@@ -48,6 +51,7 @@ class UserController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * @throws GuzzleException
      */
     public function store(StoreRequest $request)
     {
@@ -62,6 +66,17 @@ class UserController extends Controller
         $currentTime = time();
         $expireAt = date('Y-m-d H:i:s', strtotime('+1 minute', $currentTime));
 
+        $API_URL = 'https://smsplus.sslwireless.com/api/v3/send-sms';
+        $API_TOKEN = 'vyufz84x-xsfz7prj-6glud8jl-crvcwtsv-rqhmwlfh';
+        $params = [
+            "api_token" => $API_TOKEN,
+            "sid" => 'KMARTMASKAPI',
+//            "msisdn" => '01521487616',
+            "msisdn" => $user->phone,
+            "sms" => 'Your OTP is '. $code. ' Enter this OTP to verify your phone!',
+            "csms_id" => uniqid()
+        ];
+        SmsService::init()->sendSMS($params);
         OtpManager::create([
             'code' => 1234 ?? $code,
             'expireAt' => $expireAt,
@@ -70,7 +85,6 @@ class UserController extends Controller
 
         return new UserResource($user);
     }
-
     /**
      * Update the specified resource in storage.
      */
