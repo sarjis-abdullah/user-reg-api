@@ -24,11 +24,18 @@ class UserController extends Controller
         $orderBy        = $request['order_by']           ?? 'id';
         $orderDirection = $request['order_direction'] == 'asc' ? 'asc' : 'desc';
 
-        $useOrderBy     = fn($qb) => $qb->orderBy($orderBy, $orderDirection);
-        $getPaginated   = fn($qb) => $qb->paginate($limit);
-        $getAll         = fn($qb) => $qb->get();
+        $useOrderBy     = function ($qb) use ($orderBy, $orderDirection) {
+            return $qb->orderBy($orderBy, $orderDirection);
+        };
+        $getPaginated   = function ($qb) use ($limit) {
+            return $qb->paginate($limit);
+        };
+        $getAll         = function ($qb) {
+            return $qb->get();
+        };
 
-        return new UserResourceCollection(User::where('phoneVerified', true)->when($useOrderBy, $getAll, $getPaginated));
+        $response = User::where('phoneVerified', true)->when($useOrderBy, $getAll, $getPaginated);
+        return new UserResourceCollection($response);
     }
 
     /**
@@ -44,7 +51,8 @@ class UserController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        $user = User::create([...$request->validated(), 'password' => Hash::make('A!23456')]);
+        $req = array_merge($request->validated(), ['password' => Hash::make('A!23456')]);
+        $user = User::create($req);
 
         $digits = "0123456789";
         $code = "";
