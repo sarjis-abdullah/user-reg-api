@@ -78,7 +78,7 @@ class UserController extends Controller
         ];
         SmsService::init()->sendSMS($params);
         OtpManager::create([
-            'code' => 1234 ?? $code,
+            'code' => $code,
             'expireAt' => $expireAt,
             'userId' => $user->id,
         ]);
