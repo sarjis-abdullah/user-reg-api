@@ -55,7 +55,7 @@ class UserController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        $req = array_merge($request->validated(), ['password' => Hash::make('A!23456')]);
+        $req = array_merge($request->validated(), ['password' => $request->password ?? Hash::make('A!23456')]);
         $user = User::create($req);
 
         $digits = "0123456789";
@@ -116,7 +116,7 @@ class UserController extends Controller
      */
     public function login(LoginRequest $request)
     {
-        $user = User::where('phone', $request->phone)->first();
+        $user = User::where('email', $request->email)->first();
 
         if ($user instanceof User) {
             if (Hash::check($request->get('password'), $user->password)) {

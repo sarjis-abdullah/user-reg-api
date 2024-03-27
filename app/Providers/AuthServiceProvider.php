@@ -61,7 +61,9 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Passport\Passport;
-
+use Laravel\Passport\Console\ClientCommand;
+use Laravel\Passport\Console\InstallCommand;
+use Laravel\Passport\Console\KeysCommand;
 class AuthServiceProvider extends ServiceProvider
 {
     /**
@@ -70,43 +72,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        Role::class => RolePolicy::class,
-        User::class => UserPolicy::class,
-        UserRole::class => UserRolePolicy::class,
-        UserProfile::class => UserProfilePolicy::class,
 
-        Attachment::class => AttachmentPolicy::class,
-        AppSetting::class => AppSettingPolicy::class,
-
-        Admin::class => AdminPolicy::class,
-
-        CashUp::class => CashUpPolicy::class,
-
-        Company::class => CompanyPolicy::class,
-        Branch::class => BranchPolicy::class,
-
-        Manager::class => ManagerPolicy::class,
-        Employee::class => EmployeePolicy::class,
-        Customer::class => CustomerPolicy::class,
-        Supplier::class => SupplierPolicy::class,
-
-        Category::class => CategoryPolicy::class,
-        SubCategory::class => SubCategoryPolicy::class,
-        Brand::class => BrandPolicy::class,
-        Product::class => ProductPolicy::class,
-        Stock::class => StockPolicy::class,
-        StockLog::class => StockLogPolicy::class,
-        DeliveryAgency::class => DeliveryAgencyPolicy::class,
-        StockTransfer::class => StockTransferPolicy::class,
-
-        Order::class => OrderPolicy::class,
-        OrderProduct::class => OrderProductPolicy::class,
-
-        ExpenseCategory::class => ExpenseCategoryPolicy::class,
-        Expense::class => ExpensePolicy::class,
-
-        ApiKey::class => AdminPolicy::class,
-        EcomIntegration::class => EcomIntegrationPolicy::class
     ];
 
     /**
@@ -126,5 +92,11 @@ class AuthServiceProvider extends ServiceProvider
         Passport::tokensExpireIn(now()->addDay());
         Passport::refreshTokensExpireIn(now()->addDay());
         Passport::personalAccessTokensExpireIn(now()->addMonths(6));
+
+        $this->commands([
+            InstallCommand::class,
+            ClientCommand::class,
+            KeysCommand::class,
+        ]);
     }
 }
