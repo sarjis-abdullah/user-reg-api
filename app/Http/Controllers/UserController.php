@@ -37,7 +37,12 @@ class UserController extends Controller
             return $qb->get();
         };
 
-        $response = User::where('phoneVerified', true)->when($useOrderBy, $getAll, $getPaginated);
+        $response = User::where('phoneVerified', true);
+        $response = $response->when(isset($request['phone']), function ($query) use ($request) {
+            $phone = '%' . $request['phone'];
+            return $query->where('phone', 'LIKE', $phone);
+        })->when($useOrderBy, $getAll, $getPaginated);
+
         return new UserResourceCollection($response);
     }
 
@@ -124,10 +129,10 @@ class UserController extends Controller
 
                 return response(['accessToken' => $token, 'user' => new UserResource($user)], 200);
             } else {
-                return response(['message' => __('auth.password_mismatch')], 422);
+                return response(['message' => 'password mismatch error'], 422);
             }
         } else {
-            return response(['message' => __('auth.no_user')], 422);
+            return response(['message' => 'No user in this credentials'], 422);
         }
     }
 }
