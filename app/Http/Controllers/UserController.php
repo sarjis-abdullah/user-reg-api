@@ -41,7 +41,7 @@ class UserController extends Controller
         $response = $response->when(isset($request['phone']), function ($query) use ($request) {
             $phone = '%' . $request['phone'];
             return $query->where('phone', 'LIKE', $phone);
-        })->when($useOrderBy, $getAll, $getPaginated);
+        })->orderBy($orderBy, $orderDirection)->paginate($limit);
 
         return new UserResourceCollection($response);
     }

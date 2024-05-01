@@ -32,6 +32,8 @@ class User extends Authenticatable
         'phoneVerified',
         'emailVerified',
         'password',
+        'bloodGroup',
+        'lastName',
     ];
 
     /**
