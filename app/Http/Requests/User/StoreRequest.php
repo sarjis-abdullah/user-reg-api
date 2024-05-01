@@ -25,11 +25,13 @@ class StoreRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
+            'lastName' => 'required|string',
             'address' => 'required|string',
             'phone' => 'required|string|regex:/(01)[0-9]{9}/|min:11|unique:users,phone',
             'birthDate' => 'required|date|date_format:Y-m-d|before:today',
-            'email' => 'nullable|email|unique:users,email',
+            'email' => 'required|email|unique:users,email',
             'occupation' => 'nullable|string',
+            'bloodGroup' => 'nullable|string',
             'familyMembers' => 'nullable|string',
             'gender' => 'nullable|string',
             'anniversary' => 'nullable|date|date_format:Y-m-d',

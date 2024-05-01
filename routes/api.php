@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 //use Illuminate\Support\Facades\Artisan;
@@ -50,6 +52,12 @@ use Illuminate\Support\Facades\Route;
 //});
 Route::get('/', function (Request $request) {
     return ['message' => "Api is working fine."];
+});
+
+Route::get('/migrate', function (Request $request) {
+    Artisan::call('migrate');
+
+    return 'Migration completed successfully.';
 });
 
 Route::post('/user/login', [UserController::class, 'login'])->name('user/login');
