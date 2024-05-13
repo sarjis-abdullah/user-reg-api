@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\UserRegistrationCompletedEvent;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -38,6 +39,10 @@ use Illuminate\Support\Facades\Route;
 //    ]);
 //    echo "Admin added<br>";
 //});
+Route::get('/email', function () {
+    event(new UserRegistrationCompletedEvent(\App\Models\User::find(1)));
+    echo "email sent<br>";
+});
 
 //Route::get('/install-passport', function () {
 //    // Execute the passport:install Artisan command
