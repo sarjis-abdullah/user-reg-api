@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserRegistrationCompletedEvent;
 use App\Http\Requests\User\IndexRequest;
 use App\Http\Requests\User\LoginRequest;
 use App\Http\Requests\User\StoreRequest;
@@ -105,6 +106,7 @@ class UserController extends Controller
                 $user->update([
                     'phoneVerified' => true
                 ]);
+                event(new UserRegistrationCompletedEvent($user));
                 return new UserResource($user);
             }
 
