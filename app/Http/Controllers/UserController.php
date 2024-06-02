@@ -62,6 +62,18 @@ class UserController extends Controller
     public function store(StoreRequest $request)
     {
         $req = array_merge($request->validated(), ['password' => $request->password ?? Hash::make('A!23456')]);
+
+        if (!isset($request->member_id)){
+            $lastUser = User::orderBy('id', 'desc')->first();
+            $member_id = null;
+            if ($lastUser->member_id){
+                $member_id = $lastUser->member_id + 1;
+            }else {
+                $member_id = 200000;
+            }
+            $req['member_id'] = $member_id;
+        }
+
         $user = User::create($req);
 
         $digits = "0123456789";

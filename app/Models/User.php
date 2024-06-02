@@ -33,6 +33,7 @@ class User extends Authenticatable
         'emailVerified',
         'password',
         'bloodGroup',
+        'member_id',
         'lastName',
     ];
 

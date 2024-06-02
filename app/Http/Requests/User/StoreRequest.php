@@ -36,6 +36,7 @@ class StoreRequest extends FormRequest
             'gender' => 'nullable|string',
             'anniversary' => 'nullable|date|date_format:Y-m-d',
             'hasComplimentaryCard' => 'nullable|boolean',
+            'member_id' => 'sometimes|required|string',
         ];
     }
 
