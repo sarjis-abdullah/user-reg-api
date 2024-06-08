@@ -35,6 +35,7 @@ class User extends Authenticatable
         'bloodGroup',
         'member_id',
         'lastName',
+        'is_new_member',
     ];
 
     /**
