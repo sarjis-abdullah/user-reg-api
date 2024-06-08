@@ -20,25 +20,33 @@ use Illuminate\Support\Facades\Route;
 //    echo "Config cleared<br>";
 //});
 //
-//Route::get('/add-admin', function () {
-//    \App\Models\User::create([
-//        'name' => 'Admin',
-//        'address' => 'Khulshi Mart Admin',
-//        'phone' => '01521487616',
-//        'email' => 'it@khulshimart.com',
-//        'birthDate' => '2010-01-01',
-//        'password' => \Illuminate\Support\Facades\Hash::make('mplit@2024')
-//    ]);
-//    \App\Models\User::create([
-//        'name' => 'Admin',
-//        'address' => 'Khulshi Mart Admin',
-//        'phone' => '01521487616',
-//        'email' => 'admin@khulshimart.com',
-//        'birthDate' => '2010-01-01',
-//        'password' => \Illuminate\Support\Facades\Hash::make('khulshi@321')
-//    ]);
-//    echo "Admin added<br>";
-//});
+Route::get('/add-admin', function () {
+    $admins = [
+        [
+            'name' => 'Admin',
+            'address' => 'Khulshi Mart Admin',
+            'phone' => '01521487616',
+            'email' => 'it@khulshimart.com',
+            'birthDate' => '2010-01-01',
+            'password' => \Illuminate\Support\Facades\Hash::make('mplit@2024')
+        ],
+        [
+            'name' => 'Admin',
+            'address' => 'Khulshi Mart Admin',
+            'phone' => '01521487616',
+            'email' => 'admin@khulshimart.com',
+            'birthDate' => '2010-01-01',
+            'password' => \Illuminate\Support\Facades\Hash::make('khulshi@321')
+        ],
+    ];
+    foreach ($admins as $admin) {
+        $existingUser = \App\Models\User::where('email', $admin['email'])->first();
+        if ($existingUser == null) {
+            \App\Models\User::create($admin);
+        }
+    }
+    echo "Admin added<br>";
+});
 Route::get('/email', function () {
     event(new UserRegistrationCompletedEvent(\App\Models\User::find(1)));
     echo "email sent<br>";
