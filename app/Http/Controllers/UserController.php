@@ -7,6 +7,7 @@ use App\Http\Requests\User\IndexRequest;
 use App\Http\Requests\User\LoginRequest;
 use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
+use App\Http\Resources\OtpManagerResourceCollection;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\UserResourceCollection;
 use App\Models\OtpManager;
@@ -45,6 +46,38 @@ class UserController extends Controller
         })->orderBy($orderBy, $orderDirection)->paginate($limit);
 
         return new UserResourceCollection($response);
+    }
+
+    public function indexOtp(IndexRequest $request)
+    {
+        $limit          = (int) $request['per_page']  ?? 20;
+        $orderBy        = $request['order_by']           ?? 'id';
+        $orderDirection = $request['order_direction'] == 'asc' ? 'asc' : 'desc';
+
+        $useOrderBy     = function ($qb) use ($orderBy, $orderDirection) {
+            return $qb->orderBy($orderBy, $orderDirection);
+        };
+        $getPaginated   = function ($qb) use ($limit) {
+            return $qb->paginate($limit);
+        };
+        $getAll         = function ($qb) {
+            return $qb->get();
+        };
+
+        $response = OtpManager::query();
+        if (isset($request['phone'])){
+            $phone = '%' . $request['phone'];
+            $user = User::where('phone', 'LIKE', $phone)->first();
+            if ($user != null){
+                $response = $response->where('userId', $user->id);
+            }else{
+                $response = $response->where('userId', $user);
+            }
+
+        }
+        $response = $response->orderBy($orderBy, $orderDirection)->paginate($limit);
+
+        return new OtpManagerResourceCollection($response);
     }
 
     /**
@@ -119,6 +152,7 @@ class UserController extends Controller
                 $user->update([
                     'phoneVerified' => true
                 ]);
+                $otpData->delete();
                 event(new UserRegistrationCompletedEvent($user));
                 return new UserResource($user);
             }

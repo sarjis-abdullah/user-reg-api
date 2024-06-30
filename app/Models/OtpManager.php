@@ -15,4 +15,9 @@ class OtpManager extends Model
         'type',
         'code',
     ];
+
+    function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'userId');
+    }
 }

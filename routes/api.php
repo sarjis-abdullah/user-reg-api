@@ -79,4 +79,5 @@ Route::post('/user', [UserController::class, 'store'])->name('user.store');
 
 Route::middleware(['auth:api'])->group(function () {
     Route::get('/user', [UserController::class, 'index'])->name('user.index');
+    Route::get('/otp-list', [UserController::class, 'indexOtp'])->name('user.otp.index');
 });
